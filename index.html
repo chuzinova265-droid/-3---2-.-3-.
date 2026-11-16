@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контрольная работа</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #d9c8a9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        main { width: 100%; height: 100%; display: flex; }
+        .scene-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: calc(30% + 405px);
+            height: 100vh;
+            margin-left: 0;
+            flex-shrink: 0;
+            position: relative;
+            background: #d9c8a9;
+        }
+        .svg-container {
+            width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #d9c8a9;
+            position: relative;
+        }
+        svg { display: block; width: 100%; height: 100%; background: transparent; }
+        .flower-emoji { font-size: 5em; line-height: 1; dominant-baseline: central; text-anchor: middle; }
+        .desk-group { cursor: default; }
+        #clock-overlay {
+            position: absolute; left: 4.57%; top: 10%;
+            width: 18%; aspect-ratio: 1 / 1;
+            cursor: pointer; z-index: 20;
+        }
+        #time-question {
+            position: absolute; top: calc(-35% + 6px); left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 900;
+            font-size: clamp(12px, 1.8vw, 22px);
+            color: #cc0000;
+            text-shadow: 0 0 8px #ffaaaa;
+            opacity: 0; transition: opacity 0.15s ease;
+            white-space: nowrap; pointer-events: none;
+            text-align: center;
+        }
+        #time-question.show { opacity: 1; }
+        #clock-face {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: #fcf8ed;
+            border: max(3px, 0.6vw) solid #3d2b1b;
+            box-shadow: 0 4px 4px #00000040;
+            position: relative;
+        }
+        .clock-number {
+            position: absolute;
+            font-size: max(8px, 1vw);
+            font-weight: bold;
+            color: #1f2a1e;
+            text-align: center;
+            transform: translate(-50%, -50%);
+        }
+        .clock-hand {
+            position: absolute;
+            bottom: 50%; left: 50%;
+            transform-origin: bottom center;
+            border-radius: 2px;
+        }
+        .right-frame {
+            margin: 40px auto;
+            width: calc(30% + 265px);
+            height: calc(100vh - 80px);
+            background-color: #fdfbf7;
+            border-radius: 4px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .bottom-instruction {
+            position: absolute; bottom: 24px; left: 0;
+            width: 100%; text-align: center;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: clamp(16px, 2.2vw, 22px);
+            letter-spacing: -0.5px;
+            pointer-events: none;
+            z-index: 15;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        h1.main-title {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #3e2723;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: clamp(18px, 2.5vw, 28px);
+        }
+        .motto {
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+            font-style: normal;
+            color: #00008B;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(22px, 2.8vw, 32px);
+            line-height: 1.4;
+        }
+        .progress-container { width: 100%; margin-bottom: 15px; text-align: center; }
+        .progress-text {
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            color: #800020;
+            margin-bottom: 8px;
+            font-size: clamp(20px, 2.5vw, 26px);
+        }
+        .progress-bar-bg {
+            width: 100%; height: 10px;
+            background-color: #e0d0b0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .task-section { display: none; width: 100%; animation: fadeIn 0.5s; }
+        .task-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .task-title {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #3e2723;
+            font-size: clamp(16px, 2.2vw, 24px);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #d9c8a9;
+            padding-bottom: 5px;
+        }
+        .task-content {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #3e2723;
+            font-size: clamp(14px, 1.8vw, 20px);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .task-content p {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .line-input {
+            border: none;
+            border-bottom: 2px solid #3e2723;
+            background: transparent;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #3e2723;
+            font-size: clamp(16px, 2vw, 22px);
+            outline: none;
+            padding: 2px 5px;
+            border-radius: 0;
+            cursor: text;
+            flex: 1;
+            min-width: 200px;
+            max-width: 600px;
+        }
+        .line-input-short {
+            flex: 0 0 55px !important;
+            min-width: 55px !important;
+            max-width: 55px !important;
+            text-align: center;
+        }
+        .line-input:focus {
+            border-bottom-color: #cc0000;
+            background-color: rgba(255,255,255,0.5);
+        }
+        .btn {
+            background-color: #3e2723;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .btn:hover { background-color: #5a3b35; }
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .feedback-msg {
+            margin-top: 10px;
+            font-weight: 900;
+            font-family: Arial, sans-serif;
+            min-height: 30px;
+            font-size: clamp(22px, 3vw, 28px);
+            white-space: normal;
+            text-align: center;
+        }
+        .error { color: #cc0000; }
+        .success { color: #2e7d32; }
+        .math-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .column-calc {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: clamp(20px, 2.5vw, 28px);
+            color: #3e2723;
+            line-height: 1.3;
+            text-align: right;
+            width: 130px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            vertical-align: top;
+        }
+        .calc-input {
+            border: 2px solid #d9c8a9;
+            background: #fff;
+            text-align: right;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: clamp(20px, 2.5vw, 28px);
+            color: #3e2723;
+            width: 100%;
+            height: 32px;
+            padding: 2px 0;
+            outline: none;
+            cursor: text;
+            border-radius: 3px;
+            transition: all 0.2s;
+            letter-spacing: 1ch;
+            line-height: 28px;
+            display: block;
+            box-sizing: border-box;
+            margin: 0;
+        }
+        .calc-input:hover { background: #fff9e6; border-color: #3e2723; }
+        .calc-input:focus {
+            background-color: #fff;
+            border-color: #cc0000;
+            box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.2);
+        }
+        .calc-line {
+            border-top: 2px solid #3e2723;
+            margin: 1px 0;
+            width: 100%;
+            height: 2px;
+        }
+        .check-block { flex: 1; min-width: 200px; }
+        .check-label {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #3e2723;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .order-box {
+            width: 24px; height: 24px;
+            border: 1.5px solid #3e2723;
+            background: #fff;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            color: #cc0000;
+            margin: 0 auto 2px auto;
+            display: block;
+            outline: none;
+            border-radius: 3px;
+        }
+        .order-box:focus { border-color: #cc0000; background-color: #fff5f5; }
+        .expr-container {
+            display: inline-flex;
+            align-items: flex-end;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: clamp(16px, 2vw, 20px);
+            color: #3e2723;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .op-group {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 3px;
+            vertical-align: bottom;
+        }
+        .op-symbol { display: block; margin-top: 2px; }
+        .result-box {
+            text-align: center;
+            padding: 20px;
+            border: 3px dashed #3e2723;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+        .res-name {
+            font-size: clamp(18px, 2.5vw, 24px);
+            font-weight: bold;
+            color: #3e2723;
+            margin-bottom: 15px;
+        }
+        .res-grade-text {
+            color: #800000;
+            font-weight: bold;
+            font-size: clamp(32px, 5vw, 48px);
+            margin: 10px 0;
+        }
+        .res-correct-text {
+            color: #cc0000;
+            font-weight: bold;
+            font-size: clamp(18px, 2.5vw, 24px);
+            margin: 10px 0;
+        }
+        .res-motivation-text {
+            color: #006400;
+            font-weight: bold;
+            font-size: clamp(16px, 2.2vw, 22px);
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+        .final-warning {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #cc0000;
+            font-weight: bold;
+        }
+        .confetti-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        .flower-particle {
+            position: absolute;
+            bottom: -50px;
+            font-size: 28px;
+            animation: floatUp 4s linear forwards;
+            opacity: 0.9;
+            will-change: transform, opacity;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(720deg); opacity: 0; }
+        }
+        .teacher-emoji {
+            text-align: center;
+            font-size: 16em;
+            line-height: 0.75;
+            user-select: none;
+            opacity: 0.9;
+            pointer-events: none;
+            margin-top: 40px;
+        }
+        #page-intro {
+            position: static !important;
+        }
+        #page-intro .teacher-emoji {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 0;
+        }
+        @media screen and (max-width: 1024px) {
+            .scene-wrapper { width: 40%; }
+            .right-frame { width: 55%; margin: 40px auto; }
+        }
+        @media screen and (max-width: 768px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .scene-wrapper { width: 100%; height: 40vh; flex-shrink: 1; }
+            .right-frame {
+                position: relative; top: 0; bottom: 0; right: 0;
+                width: 100%; height: auto; min-height: 60vh;
+                margin: 0; padding: 15px;
+            }
+            .bottom-instruction { display: none; }
+            .math-row { flex-direction: column; gap: 20px; }
+            .teacher-emoji {
+                position: relative;
+                bottom: auto;
+                transform: none;
+                left: auto;
+                font-size: 10em;
+                margin-top: 30px;
+                pointer-events: auto;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .scene-wrapper { height: 30vh; }
+            .btn { width: 100%; margin-right: 0; margin-bottom: 10px; }
+            .expr-container { font-size: 14px; }
+            .order-box { width: 20px; height: 20px; font-size: 12px; }
+        }
+        @media screen and (max-width: 360px) {
+            .right-frame { padding: 10px; }
+            h1.main-title { font-size: 18px; }
+        }
+        @media screen and (min-height: 900px) and (max-width: 1024px) {
+            .scene-wrapper { height: 50vh; }
+        }
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            body { flex-direction: row; }
+            .scene-wrapper { width: 30%; height: 100vh; }
+            .right-frame {
+                position: absolute; top: 10px; bottom: 10px; right: 10px;
+                width: 65%; height: calc(100vh - 20px); margin: 0;
+            }
+            .bottom-instruction { display: none; }
+            .teacher-emoji { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="scene-wrapper">
+            <div class="svg-container">
+                <svg viewBox="0 0 700 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="0" width="700" height="280" fill="#e8dec6" />
+                    <rect x="0" y="280" width="700" height="120" fill="#b5916a" />
+                    <rect x="0" y="280" width="700" height="120" fill="url(#floorPattern)" />
+                    <defs>
+                        <pattern id="floorPattern" width="60" height="120" patternUnits="userSpaceOnUse">
+                            <rect width="60" height="120" fill="#b5916a" />
+                            <rect x="0" y="0" width="58" height="120" fill="#a8835e" />
+                            <line x1="0" y1="0" x2="0" y2="120" stroke="#8b6f4e" stroke-width="1" />
+                        </pattern>
+                        <filter id="clockShadow" x="-10%" y="-10%" width="130%" height="130%">
+                            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#00000040" />
+                        </filter>
+                        <radialGradient id="boardGrad" cx="30%" cy="40%" r="70%">
+                            <stop offset="0%" stop-color="#2d5a44" />
+                            <stop offset="100%" stop-color="#143024" />
+                        </radialGradient>
+                    </defs>
+                    <rect x="180" y="30" width="340" height="130" rx="12" ry="12" fill="#1e3a2f" stroke="#5f7a5a" stroke-width="6" />
+                    <rect x="180" y="30" width="340" height="130" rx="12" ry="12" fill="url(#boardGrad)" />
+                    <text x="350" y="55" fill="#ffffff" font-weight="bold" font-size="16" letter-spacing="3" text-anchor="middle" font-family="'Segoe UI', sans-serif">Контрольная работа</text>
+                    <rect x="230" y="165" width="240" height="8" rx="4" fill="#d4b48c" />
+                    <g class="desk-group" transform="translate(120, 270)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(280, 270)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(440, 270)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(600, 270)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(120, 330)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(280, 330)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(440, 330)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <g class="desk-group" transform="translate(600, 330)"><rect x="-40" y="-10" width="80" height="30" rx="4" fill="#b58b5a" stroke="#6f5437" stroke-width="2" /><rect x="-44" y="-16" width="88" height="10" rx="4" fill="#dab07c" /><rect x="-32" y="20" width="8" height="14" fill="#4d3a25" /><rect x="24" y="20" width="8" height="14" fill="#4d3a25" /><g transform="translate(0, 35)"><rect x="-18" y="-20" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><rect x="-18" y="-12" width="36" height="4" rx="1" fill="#8b6f4e" stroke="#4d3a25" stroke-width="1" /><line x1="-16" y1="-20" x2="-16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="16" y1="-20" x2="16" y2="0" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><rect x="-16" y="0" width="32" height="8" rx="2" fill="#6b4f32" stroke="#4d3a25" stroke-width="1.5" /><line x1="-14" y1="8" x2="-14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /><line x1="14" y1="8" x2="14" y2="13" stroke="#4d3a25" stroke-width="2.5" stroke-linecap="round" /></g></g>
+                    <text x="40" y="360" font-size="5em" class="flower-emoji">🪴</text>
+                    <text x="660" y="360" font-size="5em" class="flower-emoji">🪴</text>
+                </svg>
+                <div id="clock-overlay">
+                    <div id="time-question">Который час?</div>
+                    <div id="clock-face">
+                        <div class="clock-number" style="top: 8%; left: 50%;">12</div>
+                        <div class="clock-number" style="top: 13.6%; left: 71%;">1</div>
+                        <div class="clock-number" style="top: 29%; left: 86.4%;">2</div>
+                        <div class="clock-number" style="top: 50%; left: 92%;">3</div>
+                        <div class="clock-number" style="top: 71%; left: 86.4%;">4</div>
+                        <div class="clock-number" style="top: 86.4%; left: 71%;">5</div>
+                        <div class="clock-number" style="top: 92%; left: 50%;">6</div>
+                        <div class="clock-number" style="top: 86.4%; left: 29%;">7</div>
+                        <div class="clock-number" style="top: 71%; left: 13.6%;">8</div>
+                        <div class="clock-number" style="top: 50%; left: 8%;">9</div>
+                        <div class="clock-number" style="top: 29%; left: 13.6%;">10</div>
+                        <div class="clock-number" style="top: 13.6%; left: 29%;">11</div>
+                        <div id="hour-hand" class="clock-hand" style="width: max(3px, 0.4vw); height: 30%; background: #2a3a2a; transform: translateX(-50%) rotate(30deg);"></div>
+                        <div id="minute-hand" class="clock-hand" style="width: max(2px, 0.3vw); height: 45%; background: #3d3d3d; transform: translateX(-50%) rotate(120deg);"></div>
+                        <div id="second-hand" class="clock-hand" style="width: max(1px, 0.15vw); height: 50%; background: #b33e3e; transform: translateX(-50%) rotate(200deg);"></div>
+                        <div style="position: absolute; top: 50%; left: 50%; width: max(6px, 0.8vw); height: max(6px, 0.8vw); background: #1f2a1e; border: max(1px, 0.15vw) solid #fcf8ed; border-radius: 50%; transform: translate(-50%, -50%);"></div>
+                    </div>
+                </div>
+                <div class="bottom-instruction">Нажми на часы и ответь на вопрос.</div>
+            </div>
+        </div>
+
+        <section class="right-frame" aria-label="Рабочая область контрольной работы">
+            <div id="confetti-layer" class="confetti-layer"></div>
+            <div id="page-intro" class="task-section active">
+                <h1 class="main-title">Контрольная работа</h1>
+                <p class="motto">Мы внимательные, смелые, умные — <br>С математикой мы самые дружные!</p>
+                <div class="progress-container">
+                    <div class="progress-text">Прогресс выполнения: <span id="progress-count">0</span>/8</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+                </div>
+                <div class="task-content">
+                    <label for="student-name">Регистрация ученика:</label><br>
+                    <input type="text" id="student-name" placeholder="Фамилия, имя" autocomplete="off" style="width: 100%; padding: 10px; border: 2px solid #d9c8a9; border-radius: 4px; font-family: Arial; font-weight: bold; color: #3e2723; font-size: clamp(18px, 2.5vw, 24px);">
+                    <div id="name-error" class="feedback-msg error"></div>
+                </div>
+                <button class="btn" onclick="startWork()">Начать решать</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task1" class="task-section">
+                <h2 class="task-title">Задание 1. Тема: «Сочетательное свойство сложения»</h2>
+                <div class="task-content">
+                    <p>Сгруппируй парами удобные числа, взяв их в скобки. Запиши решение и ответ.</p>
+                    <p>132 + 111 + 128 + 29 = <input type="text" class="line-input" id="t1-q1" autocomplete="off"></p>
+                    <p>245 + 237 + 155 + 123 = <input type="text" class="line-input" id="t1-q2" autocomplete="off"></p>
+                    <p>426 + 97 + 86 + 103 + 174 = <input type="text" class="line-input" id="t1-q3" autocomplete="off"></p>
+                </div>
+                <div id="fb-task1" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(1)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task2')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task2" class="task-section">
+                <h2 class="task-title">Задание 2. Тема: «Сочетательное свойство умножения»</h2>
+                <div class="task-content">
+                    <p>Сгруппируй парами удобные числа, взяв их в скобки. Запиши решение и ответ.</p>
+                    <p>2х2х5х4х6 = <input type="text" class="line-input" id="t2-q1" autocomplete="off"></p>
+                    <p>8х2х5х8 = <input type="text" class="line-input" id="t2-q2" autocomplete="off"></p>
+                    <p>5х9х2х10х8 = <input type="text" class="line-input" id="t2-q3" autocomplete="off"></p>
+                </div>
+                <div id="fb-task2" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(2)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task3')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task3" class="task-section">
+                <h2 class="task-title">Задание 3. Тема: «Проверка правильности вычислений разными способами»</h2>
+                <div class="task-content">
+                    <p>Реши выражения и запиши рядом проверку.</p>
+                    <div class="math-row">
+                        <div class="column-calc">
+                            6 5 1<br>- 3 8 4
+                            <div class="calc-line"></div>
+                            <input type="text" class="calc-input" id="t3-a1" autocomplete="off">
+                        </div>
+                        <div class="check-block">
+                            <span class="check-label">Проверка:</span>
+                            <div class="column-calc">
+                                <input type="text" class="calc-input" id="t3-c1-1" autocomplete="off">
+                                <input type="text" class="calc-input" id="t3-c1-2" autocomplete="off">
+                                <div class="calc-line"></div>
+                                <input type="text" class="calc-input" id="t3-c1-3" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="math-row">
+                        <div class="column-calc">
+                            7 1 5<br>+ 1 8 5
+                            <div class="calc-line"></div>
+                            <input type="text" class="calc-input" id="t3-a2" autocomplete="off">
+                        </div>
+                        <div class="check-block">
+                            <span class="check-label">Проверка:</span>
+                            <div class="column-calc">
+                                <input type="text" class="calc-input" id="t3-c2-1" autocomplete="off">
+                                <input type="text" class="calc-input" id="t3-c2-2" autocomplete="off">
+                                <div class="calc-line"></div>
+                                <input type="text" class="calc-input" id="t3-c2-3" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="math-row">
+                        <div class="column-calc">
+                            7 8 2<br>- 5 8 4
+                            <div class="calc-line"></div>
+                            <input type="text" class="calc-input" id="t3-a3" autocomplete="off">
+                        </div>
+                        <div class="check-block">
+                            <span class="check-label">Проверка:</span>
+                            <div class="column-calc">
+                                <input type="text" class="calc-input" id="t3-c3-1" autocomplete="off">
+                                <input type="text" class="calc-input" id="t3-c3-2" autocomplete="off">
+                                <div class="calc-line"></div>
+                                <input type="text" class="calc-input" id="t3-c3-3" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="fb-task3" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(3)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task4')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task4" class="task-section">
+                <h2 class="task-title">Задание 4. Тема: «Таблица умножения и деления»</h2>
+                <div class="task-content">
+                    <p>Вычисли.</p>
+                    <div class="task4-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 10px; font-family: Arial, sans-serif; font-weight: bold; color: #3e2723; font-size: clamp(22px, 3vw, 28px);">
+                        <p>64:8=<input type="text" class="line-input line-input-short" id="t4-q1" autocomplete="off"></p>
+                        <p>4х7=<input type="text" class="line-input line-input-short" id="t4-q2" autocomplete="off"></p>
+                        <p>35:7=<input type="text" class="line-input line-input-short" id="t4-q3" autocomplete="off"></p>
+                        <p>6х7=<input type="text" class="line-input line-input-short" id="t4-q4" autocomplete="off"></p>
+                        <p>25:5=<input type="text" class="line-input line-input-short" id="t4-q5" autocomplete="off"></p>
+                        <p>2х7=<input type="text" class="line-input line-input-short" id="t4-q6" autocomplete="off"></p>
+                        <p>24:3=<input type="text" class="line-input line-input-short" id="t4-q7" autocomplete="off"></p>
+                        <p>4х8=<input type="text" class="line-input line-input-short" id="t4-q8" autocomplete="off"></p>
+                        <p>18:6=<input type="text" class="line-input line-input-short" id="t4-q9" autocomplete="off"></p>
+                        <p>7х7=<input type="text" class="line-input line-input-short" id="t4-q10" autocomplete="off"></p>
+                        <p>48:8=<input type="text" class="line-input line-input-short" id="t4-q11" autocomplete="off"></p>
+                        <p>7х8=<input type="text" class="line-input line-input-short" id="t4-q12" autocomplete="off"></p>
+                        <p>21:7=<input type="text" class="line-input line-input-short" id="t4-q13" autocomplete="off"></p>
+                        <p>6х10=<input type="text" class="line-input line-input-short" id="t4-q14" autocomplete="off"></p>
+                        <p>9х7=<input type="text" class="line-input line-input-short" id="t4-q15" autocomplete="off"></p>
+                        <p>24:8=<input type="text" class="line-input line-input-short" id="t4-q16" autocomplete="off"></p>
+                        <p>81:9=<input type="text" class="line-input line-input-short" id="t4-q17" autocomplete="off"></p>
+                        <p>70:10=<input type="text" class="line-input line-input-short" id="t4-q18" autocomplete="off"></p>
+                    </div>
+                </div>
+                <div id="fb-task4" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(4)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task5')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task5" class="task-section">
+                <h2 class="task-title">Задание 5. Тема: «Порядок действий в выражении»</h2>
+                <div class="task-content">
+                    <p>Расставь порядок действий над выражениями и вычисли их значения.</p>
+                    <div class="expr-container">
+                        <span>(6</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o1-1" maxlength="1"><span class="op-symbol">х</span></span>
+                        <span>6</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o1-2" maxlength="1"><span class="op-symbol">+</span></span>
+                        <span>45)</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o1-3" maxlength="1"><span class="op-symbol">+</span></span>
+                        <span>529 = </span>
+                        <input type="text" class="line-input line-input-short" id="t5-q1" autocomplete="off">
+                    </div><br>
+                    <div class="expr-container">
+                        <span>709</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o2-1" maxlength="1"><span class="op-symbol">–</span></span>
+                        <span>28</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o2-2" maxlength="1"><span class="op-symbol">:</span></span>
+                        <span>7</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o2-3" maxlength="1"><span class="op-symbol">х</span></span>
+                        <span>9 = </span>
+                        <input type="text" class="line-input line-input-short" id="t5-q2" autocomplete="off">
+                    </div><br>
+                    <div class="expr-container">
+                        <span>63</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o3-1" maxlength="1"><span class="op-symbol">:</span></span>
+                        <span>7</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o3-2" maxlength="1"><span class="op-symbol">х</span></span>
+                        <span>10</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o3-3" maxlength="1"><span class="op-symbol">–</span></span>
+                        <span>(6</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o3-4" maxlength="1"><span class="op-symbol">х</span></span>
+                        <span>6</span>
+                        <span class="op-group"><input type="text" class="order-box" id="t5-o3-5" maxlength="1"><span class="op-symbol">+</span></span>
+                        <span>39) = </span>
+                        <input type="text" class="line-input line-input-short" id="t5-q3" autocomplete="off">
+                    </div>
+                </div>
+                <div id="fb-task5" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(5)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task6')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task6" class="task-section">
+                <h2 class="task-title">Задание 6. Тема: «Площадь прямоугольника»</h2>
+                <div class="task-content">
+                    <p>Ширина стороны прямоугольника 4 см, а длина в 2 раза больше. Вычисли площадь прямоугольника. Запиши решение с пояснениями.</p>
+                    <p>Решение:<textarea id="t6-solution" autocomplete="off" style="width: 100%; min-height: 100px; border: 2px solid #d9c8a9; border-radius: 4px; padding: 8px; font-family: Arial; font-weight: bold; color: #3e2723; font-size: clamp(16px, 2vw, 22px);"></textarea></p>
+                    <p>Ответ: <input type="text" class="line-input" id="t6-answer" autocomplete="off" style="width: 200px; text-align: left; font-size: clamp(16px, 2vw, 22px);"></p>
+                </div>
+                <div id="fb-task6" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(6)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task7')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task7" class="task-section">
+                <h2 class="task-title">Задание 7. Тема: «Устные приёмы сложения и вычитания многозначных чисел»</h2>
+                <div class="task-content">
+                    <p>Найди закономерность и запиши следующие 3 числа:</p>
+                    <p style="font-size: clamp(16px, 2vw, 20px); font-weight: bold; color: #3e2723; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                        а) 806, 799, 792,
+                        <input type="text" class="line-input line-input-short" id="t7-q1a" autocomplete="off">,
+                        <input type="text" class="line-input line-input-short" id="t7-q1b" autocomplete="off">,
+                        <input type="text" class="line-input line-input-short" id="t7-q1c" autocomplete="off">.
+                    </p>
+                    <p style="font-size: clamp(16px, 2vw, 20px); font-weight: bold; color: #3e2723; margin-top: 15px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                        б) 882, 894, 906,
+                        <input type="text" class="line-input line-input-short" id="t7-q2a" autocomplete="off">,
+                        <input type="text" class="line-input line-input-short" id="t7-q2b" autocomplete="off">,
+                        <input type="text" class="line-input line-input-short" id="t7-q2c" autocomplete="off">.
+                    </p>
+                </div>
+                <div id="fb-task7" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(7)">Проверить задание</button>
+                <button class="btn" onclick="nextPage('page-task8')">Следующее задание</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-task8" class="task-section">
+                <h2 class="task-title">Задание 8. Тема: «Решение задач разного вида»</h2>
+                <div class="task-content">
+                    <p>Составь выражение со скобками по тексту задачи и реши её.</p>
+                    <p>В библиотеке 3 зала. В каждом зале — 8 стеллажей. На каждом стеллаже стоит 5 коробок с книгами, а в каждой коробке лежит 2 книги. Сколько всего книг на этих стеллажах?</p>
+                    <p>Решение: <textarea id="t8-solution" autocomplete="off" style="width: 100%; min-height: 100px; border: 2px solid #d9c8a9; border-radius: 4px; padding: 8px; font-family: Arial; font-weight: bold; color: #3e2723; font-size: clamp(16px, 2vw, 22px);"></textarea></p>
+                    <p>Ответ: <input type="text" class="line-input" id="t8-answer" autocomplete="off" style="width: 200px; text-align: left; font-size: clamp(16px, 2vw, 22px);"></p>
+                </div>
+                <div id="fb-task8" class="feedback-msg"></div>
+                <button class="btn" onclick="checkTask(8)">Проверить задание</button>
+                <button class="btn" onclick="showResults()">Далее</button>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+
+            <div id="page-results" class="task-section">
+                <h2 class="task-title">Результаты работы</h2>
+                <div class="result-box">
+                    <div class="res-name">Ученик: <span id="res-name"></span></div>
+                    <div class="res-grade-text" id="res-grade"></div>
+                    <div class="res-correct-text" id="res-correct"></div>
+                    <div class="res-correct-text" style="color: #3e2723; font-size: 18px;">Ошибок: <span id="res-errors"></span></div>
+                    <p class="res-motivation-text" id="res-motivation"></p>
+                    <button class="btn" onclick="generatePDF()">Экспорт результатов в PDF</button>
+                    <p class="final-warning">Не забудь нажать на кнопку "Экспорт результатов в PDF".</p>
+                </div>
+                <div class="teacher-emoji">👩🏻‍🏫</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxzuwWXV6U9BYTSyCVRB0iUasLmgMl8EaflfC8LUIjMXLKy5vOoIq0fm3fWabkjPL0b/exec';
+
+        (function() {
+            const hourHand = document.getElementById('hour-hand');
+            const minuteHand = document.getElementById('minute-hand');
+            const secondHand = document.getElementById('second-hand');
+            const clockOverlay = document.getElementById('clock-overlay');
+            const question = document.getElementById('time-question');
+            let isPaused = false;
+            let pauseStartTime = 0;
+            let totalPausedDuration = 0;
+            const initialTotalSeconds = 10 * 3600 + 10 * 60 + 30;
+            const clockStartTimestamp = Date.now() - initialTotalSeconds * 1000;
+            function updateClock() {
+                if (!isPaused) {
+                    const now = Date.now();
+                    const elapsedSeconds = (now - clockStartTimestamp - totalPausedDuration) / 1000;
+                    const sec = elapsedSeconds % 60;
+                    const min = (elapsedSeconds * 30.0 / 60) % 60;
+                    const hour = (elapsedSeconds / 3600) % 12;
+                    const secDeg = sec * 6;
+                    const minDeg = min * 6;
+                    const hourDeg = hour * 30;
+                    if (secondHand) secondHand.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+                    if (minuteHand) minuteHand.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+                    if (hourHand) hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+                }
+                requestAnimationFrame(updateClock);
+            }
+            function toggleClock() {
+                if (isPaused) {
+                    totalPausedDuration += (Date.now() - pauseStartTime);
+                    isPaused = false;
+                    if (question) question.classList.remove('show');
+                } else {
+                    pauseStartTime = Date.now();
+                    isPaused = true;
+                    if (question) question.classList.add('show');
+                }
+            }
+            if (clockOverlay) {
+                clockOverlay.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleClock();
+                });
+            }
+            requestAnimationFrame(updateClock);
+        })();
+
+        let studentName = "";
+        let currentTask = 0;
+        let errorsCount = 0;
+        let firstAttemptCorrect = new Array(9).fill(false);
+        let taskChecked = new Array(9).fill(false);
+        let taskNeedsRevision = new Array(9).fill(false);
+        let workFinished = false;
+        let confettiInterval = null;
+
+        function playWinSound() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            const now = ctx.currentTime;
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.1);
+            osc.frequency.setValueAtTime(783.99, now + 0.2);
+            osc.frequency.setValueAtTime(1046.50, now + 0.3);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.6);
+        }
+
+        function startWork() {
+            const nameInput = document.getElementById('student-name');
+            const nameError = document.getElementById('name-error');
+            const val = nameInput.value.trim();
+            if (!val) { nameError.textContent = "Напиши полную фамилию, имя"; return; }
+            const parts = val.split(/[\s,]+/).filter(p => p.length > 0);
+            if (parts.length < 2) { nameError.textContent = "Напиши полную фамилию, имя"; return; }
+            studentName = val;
+            nextPage('page-task1');
+        }
+
+        function canProceed(taskNum) {
+            let isEmpty = false;
+            if (taskNum === 1) isEmpty = !document.getElementById('t1-q1').value.trim() || !document.getElementById('t1-q3').value.trim();
+            if (taskNum === 2) isEmpty = !document.getElementById('t2-q1').value.trim() || !document.getElementById('t2-q3').value.trim();
+            if (taskNum === 3) isEmpty = !document.getElementById('t3-a1').value.trim() || !document.getElementById('t3-c3-3').value.trim();
+            if (taskNum === 4) { for(let i=1; i<=18; i++) if(!document.getElementById(`t4-q${i}`).value.trim()) isEmpty = true; }
+            if (taskNum === 5) isEmpty = !document.getElementById('t5-q1').value.trim() || !document.getElementById('t5-q3').value.trim();
+            if (taskNum === 6) isEmpty = !document.getElementById('t6-solution').value.trim() || !document.getElementById('t6-answer').value.trim();
+            if (taskNum === 7) isEmpty = !document.getElementById('t7-q1a').value.trim() || !document.getElementById('t7-q2c').value.trim();
+            if (taskNum === 8) isEmpty = !document.getElementById('t8-solution').value.trim() || !document.getElementById('t8-answer').value.trim();
+            return !isEmpty;
+        }
+
+        function nextPage(pageId) {
+            if (currentTask > 0 && currentTask < 9) {
+                if (!taskChecked[currentTask] && !taskNeedsRevision[currentTask]) {
+                    const fb = document.getElementById('fb-task' + currentTask);
+                    if(fb) { 
+                        fb.textContent = "Нажми на кнопку «Проверить!»"; 
+                        fb.className = "feedback-msg error"; 
+                    }
+                    return;
+                }
+            }
+            document.querySelectorAll('.task-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            if (pageId.startsWith('page-task')) { currentTask = parseInt(pageId.replace('page-task', '')); }
+        }
+
+        function updateProgress() {
+            let correctCount = 0;
+            for (let i = 1; i <= 8; i++) { if (firstAttemptCorrect[i]) correctCount++; }
+            document.getElementById('progress-count').textContent = correctCount;
+            document.getElementById('progress-fill').style.width = (correctCount / 8 * 100) + '%';
+        }
+
+        function checkTask(taskNum) {
+            let feedbackEl = document.getElementById('fb-task' + taskNum);
+            
+            // Если задание уже полностью проверено и принято (не требует доработки), блокируем повторную проверку
+            if (taskChecked[taskNum] && !taskNeedsRevision[taskNum]) {
+                feedbackEl.textContent = "Задание уже проверено. Переходите к следующему заданию.";
+                feedbackEl.className = "feedback-msg error";
+                return;
+            }
+
+            feedbackEl.textContent = "";
+            feedbackEl.className = "feedback-msg";
+
+            let result;
+            if (taskNum === 1) {
+                result = checkTask1();
+            } else if (taskNum === 2) {
+                result = checkTask2();
+            } else if (taskNum === 5) {
+                result = checkTask5();
+            } else if (taskNum === 6) {
+                result = specificCheck6();
+            } else if (taskNum === 8) {
+                result = specificCheck8();
+            } else {
+                let isCorrect = false;
+                switch(taskNum) {
+                    case 3: isCorrect = checkTask3(); break;
+                    case 4: isCorrect = checkTask4(); break;
+                    case 7: isCorrect = checkTask7(); break;
+                }
+                result = { correct: isCorrect, msg: isCorrect ? "Верно! Молодец!" : "Ошибка! Решай вдумчиво!" };
+            }
+
+            if (result.correct) {
+                feedbackEl.textContent = result.msg;
+                feedbackEl.classList.add('success');
+                
+                if (result.needsRevision) {
+                    taskNeedsRevision[taskNum] = true;
+                    // Не ставим taskChecked[taskNum] = true, чтобы можно было перепроверить без штрафа
+                } else {
+                    playWinSound();
+                    firstAttemptCorrect[taskNum] = true;
+                    taskChecked[taskNum] = true;
+                    taskNeedsRevision[taskNum] = false;
+                    updateProgress();
+                }
+            } else {
+                feedbackEl.textContent = result.msg;
+                feedbackEl.classList.add('error');
+                if (!taskChecked[taskNum] && !taskNeedsRevision[taskNum]) {
+                    taskChecked[taskNum] = true;
+                    errorsCount++;
+                } else if (taskNeedsRevision[taskNum]) {
+                    taskChecked[taskNum] = true;
+                    taskNeedsRevision[taskNum] = false;
+                    errorsCount++;
+                }
+            }
+        }
+
+        function checkTask1() {
+            const q1 = document.getElementById('t1-q1').value.trim();
+            const q2 = document.getElementById('t1-q2').value.trim();
+            const q3 = document.getElementById('t1-q3').value.trim();
+            
+            if (!q1 || !q2 || !q3) {
+                return { correct: false, msg: "Ошибка! Не все выражения записаны и решены!" };
+            }
+
+            const hasParens = (str) => str.includes('(') || str.includes('[');
+            const hasAns = (str, ans) => {
+                const clean = str.replace(/\s/g, '').replace(/х|x/g, '*').replace(/=/g, '');
+                return clean.includes(ans.toString());
+            };
+            
+            if (!hasParens(q1) || !hasParens(q2) || !hasParens(q3)) {
+                return { correct: false, msg: "Ошибка! Нарушена инструкция к заданию - нет скобок!" };
+            }
+            
+            const isCorrect = hasAns(q1, 400) && hasAns(q2, 760) && hasAns(q3, 886);
+            return { correct: isCorrect, msg: isCorrect ? "Верно! Молодец!" : "Ошибка! Решай вдумчиво!" };
+        }
+
+        function checkTask2() {
+            const q1 = document.getElementById('t2-q1').value.trim();
+            const q2 = document.getElementById('t2-q2').value.trim();
+            const q3 = document.getElementById('t2-q3').value.trim();
+            
+            if (!q1 || !q2 || !q3) {
+                return { correct: false, msg: "Ошибка! Не все выражения записаны и решены!" };
+            }
+
+            const hasParens = (str) => str.includes('(') || str.includes('[');
+            const hasAns = (str, ans) => {
+                const clean = str.replace(/\s/g, '').replace(/х|x/g, '*').replace(/=/g, '');
+                return clean.includes(ans.toString());
+            };
+            
+            if (!hasParens(q1) || !hasParens(q2) || !hasParens(q3)) {
+                return { correct: false, msg: "Ошибка! Нарушена инструкция к заданию - нет скобок!" };
+            }
+
+            const q1Correct = hasAns(q1, 480) || hasAns(q1, 2400);
+            const q2Correct = hasAns(q2, 640);
+            const q3Correct = hasAns(q3, 7200);
+            
+            const isCorrect = q1Correct && q2Correct && q3Correct;
+            return { correct: isCorrect, msg: isCorrect ? "Верно! Молодец!" : "Ошибка! Решай вдумчиво!" };
+        }
+
+        function checkTask3() {
+            const a1 = document.getElementById('t3-a1').value.trim();
+            const c1_1 = document.getElementById('t3-c1-1').value.trim();
+            const c1_2 = document.getElementById('t3-c1-2').value.trim();
+            const c1_3 = document.getElementById('t3-c1-3').value.trim();
+            
+            const a2 = document.getElementById('t3-a2').value.trim();
+            const c2_1 = document.getElementById('t3-c2-1').value.trim();
+            const c2_2 = document.getElementById('t3-c2-2').value.trim();
+            const c2_3 = document.getElementById('t3-c2-3').value.trim();
+
+            const a3 = document.getElementById('t3-a3').value.trim();
+            const c3_1 = document.getElementById('t3-c3-1').value.trim();
+            const c3_2 = document.getElementById('t3-c3-2').value.trim();
+            const c3_3 = document.getElementById('t3-c3-3').value.trim();
+
+            let isCorrect = true;
+
+            if (a1 !== '267') isCorrect = false;
+            const check1 = (c1_1 === '267' && c1_2 === '384' && c1_3 === '651') || 
+                           (c1_1 === '384' && c1_2 === '267' && c1_3 === '651');
+            if (!check1) isCorrect = false;
+
+            if (a2 !== '900') isCorrect = false;
+            const check2 = (c2_1 === '900' && c2_2 === '185' && c2_3 === '715') || 
+                           (c2_1 === '900' && c2_2 === '715' && c2_3 === '185');
+            if (!check2) isCorrect = false;
+
+            if (a3 !== '198') isCorrect = false;
+            const check3 = (c3_1 === '198' && c3_2 === '584' && c3_3 === '782') || 
+                           (c3_1 === '584' && c3_2 === '198' && c3_3 === '782');
+            if (!check3) isCorrect = false;
+
+            return isCorrect;
+        }
+
+        function checkTask4() {
+            const answers = [8, 28, 5, 42, 5, 14, 8, 32, 3, 49, 6, 56, 3, 60, 63, 3, 9, 7];
+            let allCorrect = true;
+            for(let i=0; i<18; i++) {
+                const val = document.getElementById(`t4-q${i+1}`).value.trim().replace(/х|x/g, '*').replace(/:/g, '/');
+                if(val !== answers[i].toString()) allCorrect = false;
+            }
+            return allCorrect;
+        }
+
+        function checkTask5() {
+            const orderBoxes = [
+                't5-o1-1', 't5-o1-2', 't5-o1-3',
+                't5-o2-1', 't5-o2-2', 't5-o2-3',
+                't5-o3-1', 't5-o3-2', 't5-o3-3', 't5-o3-4', 't5-o3-5'
+            ];
+            let allOrderFilled = true;
+            for (let id of orderBoxes) {
+                if (!document.getElementById(id).value.trim()) {
+                    allOrderFilled = false;
+                    break;
+                }
+            }
+            if (!allOrderFilled) {
+                return { correct: false, msg: "Ошибка. Не расставлен порядок действий над выражениями!" };
+            }
+
+            const o1_1 = document.getElementById('t5-o1-1').value.trim();
+            const o1_2 = document.getElementById('t5-o1-2').value.trim();
+            const o1_3 = document.getElementById('t5-o1-3').value.trim();
+            const isOrder1 = (o1_1 === '1' && o1_2 === '2' && o1_3 === '3');
+            const q1 = document.getElementById('t5-q1').value.trim().replace(/\s/g, '');
+            const isCalc1 = q1.includes('610');
+
+            const o2_1 = document.getElementById('t5-o2-1').value.trim();
+            const o2_2 = document.getElementById('t5-o2-2').value.trim();
+            const o2_3 = document.getElementById('t5-o2-3').value.trim();
+            const isOrder2 = (o2_2 === '1' && o2_3 === '2' && o2_1 === '3');
+            const q2 = document.getElementById('t5-q2').value.trim().replace(/\s/g, '');
+            const isCalc2 = q2.includes('673');
+
+            const o3_1 = document.getElementById('t5-o3-1').value.trim();
+            const o3_2 = document.getElementById('t5-o3-2').value.trim();
+            const o3_3 = document.getElementById('t5-o3-3').value.trim();
+            const o3_4 = document.getElementById('t5-o3-4').value.trim();
+            const o3_5 = document.getElementById('t5-o3-5').value.trim();
+            const isOrder3 = (o3_4 === '1' && o3_5 === '2' && o3_1 === '3' && o3_2 === '4' && o3_3 === '5');
+            const q3 = document.getElementById('t5-q3').value.trim().replace(/\s/g, '');
+            const isCalc3 = q3.includes('15');
+
+            const isOrderCorrect = isOrder1 && isOrder2 && isOrder3;
+            const isCalcCorrect = isCalc1 && isCalc2 && isCalc3;
+
+            if (!isOrderCorrect && !isCalcCorrect) {
+                return { correct: false, msg: "Неверно расставлен порядок действий и допущены вычислительные ошибки!" };
+            } else if (!isOrderCorrect) {
+                return { correct: false, msg: "Неверно расставлен порядок действий!" };
+            } else if (!isCalcCorrect) {
+                return { correct: false, msg: "Ошибки в вычислениях!" };
+            }
+
+            return { correct: true, msg: "Верно! Молодец!" };
+        }
+
+        function specificCheck6() {
+            const rawSol = document.getElementById('t6-solution').value;
+            const rawAns = document.getElementById('t6-answer').value;
+            
+            const solClean = rawSol.toLowerCase().replace(/\s/g, '').replace(/х|x/g, '*');
+            const ansClean = rawAns.toLowerCase().replace(/\s/g, '');
+            
+            if (!ansClean.includes('32')) {
+                return { correct: false, msg: "Ошибка в ответе!" };
+            }
+            
+            const textWithoutUnits = rawSol.replace(/см|см²|см2|кв\.\s?см|квсм/gi, '');
+            const hasExplanation = /[а-яё]{4,}/i.test(textWithoutUnits) && rawSol.trim().length > 20;
+            
+            const correctUnitsRegex = /см²|см2|кв\.\s?см|квсм/i;
+            const hasCorrectUnitsInAns = correctUnitsRegex.test(rawAns);
+            const hasCorrectUnitsInSol = correctUnitsRegex.test(rawSol);
+            const hasCorrectUnits = hasCorrectUnitsInAns || hasCorrectUnitsInSol;
+            
+            const hasJustCmInAns = /см/i.test(rawAns) && !hasCorrectUnitsInAns;
+
+            if (!hasExplanation && hasJustCmInAns) {
+                return { correct: false, msg: "Нет пояснений к действиям задачи и в ответе неверно указаны единицы измерения площади!" };
+            }
+            
+            if (!hasExplanation) {
+                return { correct: false, msg: "Нет пояснений к действиям задачи!" };
+            }
+            
+            if (hasJustCmInAns) {
+                return { correct: false, msg: "В ответе неверно указаны единицы измерения площади!" };
+            }
+            
+            if (!hasCorrectUnits) {
+                return { correct: false, msg: "Неверно указаны единицы измерения площади!" };
+            }
+            
+            const hasFirstAction = /4\s*[\*хx]\s*2\s*=\s*8|2\s*[\*хx]\s*4\s*=\s*8/i.test(rawSol);
+            if (!hasFirstAction) {
+                return { correct: false, msg: "Ошибка в первом действии (нахождение длины)!" };
+            }
+            
+            const hasSecondAction = /4\s*[\*хx]\s*8\s*=\s*32|8\s*[\*хx]\s*4\s*=\s*32/i.test(solClean);
+            if (!hasSecondAction) {
+                return { correct: false, msg: "Ошибка во втором действии (нахождение площади)!" };
+            }
+            
+            return { correct: true, msg: "Верно! Молодец!" };
+        }
+
+        function checkTask7() {
+            const q1a = document.getElementById('t7-q1a').value.trim().replace(/\s/g, '');
+            const q1b = document.getElementById('t7-q1b').value.trim().replace(/\s/g, '');
+            const q1c = document.getElementById('t7-q1c').value.trim().replace(/\s/g, '');
+            const q2a = document.getElementById('t7-q2a').value.trim().replace(/\s/g, '');
+            const q2b = document.getElementById('t7-q2b').value.trim().replace(/\s/g, '');
+            const q2c = document.getElementById('t7-q2c').value.trim().replace(/\s/g, '');
+            return q1a.includes('785') && q1b.includes('778') && q1c.includes('771') &&
+                   q2a.includes('918') && q2b.includes('930') && q2c.includes('942');
+        }
+
+        function specificCheck8() {
+            const rawSol = document.getElementById('t8-solution').value;
+            const sol = rawSol.toLowerCase().replace(/\s/g, '').replace(/х|x|×/g, '*');
+            const rawAns = document.getElementById('t8-answer').value.trim();
+            const ans = rawAns.toLowerCase().replace(/\s/g, '');
+
+            if (!/[а-яё]/i.test(rawSol) || rawSol.trim().length < 15) {
+                return { correct: false, msg: "Нет пояснений к действиям задачи!" };
+            }
+
+            const hasParensAroundMultiplication = /\(\s*\d\s*[*]\s*\d\s*\)/.test(sol);
+            if (!hasParensAroundMultiplication) {
+                return { correct: false, msg: "Нарушена инструкция к задаче - нет скобок в выражении умножения!" };
+            }
+
+            if (!ans.includes('240')) {
+                return { correct: false, msg: "Ошибка в ответе!" };
+            }
+
+            const hasStructure = sol.includes('3') && sol.includes('8') && sol.includes('5') && sol.includes('2');
+            if (!hasStructure) {
+                return { correct: false, msg: "Ошибка в записи решения (должны быть числа 3, 8, 5, 2)!" };
+            }
+
+            if (/^240[к\.шт]*$/.test(ans)) {
+                return { correct: true, msg: "Напиши ответ полным!", needsRevision: true };
+            }
+
+            return { correct: true, msg: "Верно! Молодец!", needsRevision: false };
+        }
+
+        function showResults() {
+            if (taskNeedsRevision[8]) {
+                firstAttemptCorrect[8] = true;
+                taskChecked[8] = true;
+                taskNeedsRevision[8] = false;
+                updateProgress();
+            }
+            
+            nextPage('page-results');
+            let correct = 0;
+            for(let i=1; i<=8; i++) if(firstAttemptCorrect[i]) correct++;
+            const errors = 8 - correct;
+            document.getElementById('res-name').textContent = studentName;
+            document.getElementById('res-correct').textContent = `Верно: ${correct} из 8 заданий`;
+            document.getElementById('res-errors').textContent = errors;
+            let grade = 2;
+            let motivation = "";
+            if (errors === 0) {
+                grade = 5;
+                motivation = "Отличная работа! Высокий уровень знаний!";
+                startContinuousConfetti();
+            } else if (errors <= 2) {
+                grade = 4;
+                motivation = "Хорошо! Но ты можешь лучше!";
+            } else if (errors <= 5) {
+                grade = 3;
+                motivation = "Уровень знаний средний. Надо ещё упорно тренироваться!";
+            } else {
+                grade = 2;
+                motivation = "Очень плохо! Запомни: упорные тренировки достигнут высоких результатов! Заставь себя тренироваться!";
+            }
+            document.getElementById('res-grade').textContent = `Оценка ${grade}`;
+            document.getElementById('res-motivation').textContent = motivation;
+
+            sendToGoogleSheets(correct, errors, grade);
+        }
+
+        function sendToGoogleSheets(correct, errors, grade) {
+            if (workFinished) return;
+            workFinished = true;
+
+            const data = {
+                name: studentName,
+                correct: correct,
+                total: 8,
+                errors: errors,
+                grade: grade.toString()
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(() => {
+                console.log("Данные успешно отправлены в Google Sheets");
+            }).catch(err => console.error("Ошибка отправки:", err));
+        }
+
+        function generatePDF() {
+            let correct = 0;
+            for(let i=1; i<=8; i++) if(firstAttemptCorrect[i]) correct++;
+            const errors = 8 - correct;
+            const dateStr = new Date().toLocaleDateString('ru-RU');
+            const gradeText = document.getElementById('res-grade').textContent.replace('Оценка ', '');
+            
+            let mistakesHTML = `<h2 style="text-align: center; color: #cc0000; margin-top: 20px;">Работа над ошибками</h2>`;
+            
+            if (errors === 0) {
+                mistakesHTML += `<p style="text-align: center; color: #2e7d32; font-weight: bold; font-size: 18px;">Ошибок нет! Отличная работа!</p>`;
+            } else {
+                if (!firstAttemptCorrect[1]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Сочетательное свойство сложения». Задание 1</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Сгруппируй парами удобные числа, взяв их в скобки. Запиши решение и ответ.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваши ответы:</p><ul style="font-size: 14px;">`;
+                    mistakesHTML += `<li>132 + 111 + 128 + 29 = ${document.getElementById('t1-q1')?.value || 'пусто'}</li>`;
+                    mistakesHTML += `<li>245 + 237 + 155 + 123 = ${document.getElementById('t1-q2')?.value || 'пусто'}</li>`;
+                    mistakesHTML += `<li>426 + 97 + 86 + 103 + 174 = ${document.getElementById('t1-q3')?.value || 'пусто'}</li></ul>`;
+                }
+                if (!firstAttemptCorrect[2]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Сочетательное свойство умножения». Задание 2</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Сгруппируй парами удобные числа, взяв их в скобки. Запиши решение и ответ.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваши ответы:</p><ul style="font-size: 14px;">`;
+                    mistakesHTML += `<li>2х2х5х4х6 = ${document.getElementById('t2-q1')?.value || 'пусто'}</li>`;
+                    mistakesHTML += `<li>8х2х5х8 = ${document.getElementById('t2-q2')?.value || 'пусто'}</li>`;
+                    mistakesHTML += `<li>5х9х2х10х8 = ${document.getElementById('t2-q3')?.value || 'пусто'}</li></ul>`;
+                }
+                if (!firstAttemptCorrect[3]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Проверка правильности вычислений разными способами». Задание 3</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Реши выражения и запиши рядом проверку.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваши ответы:</p><ul style="font-size: 14px;">`;
+                    mistakesHTML += `<li>651 - 384 = ${document.getElementById('t3-a1')?.value || 'пусто'}, Проверка: ${document.getElementById('t3-c1-1')?.value || '_'} ${document.getElementById('t3-c1-2')?.value || '_'} = ${document.getElementById('t3-c1-3')?.value || '_'}</li>`;
+                    mistakesHTML += `<li>715 + 185 = ${document.getElementById('t3-a2')?.value || 'пусто'}, Проверка: ${document.getElementById('t3-c2-1')?.value || '_'} ${document.getElementById('t3-c2-2')?.value || '_'} = ${document.getElementById('t3-c2-3')?.value || '_'}</li>`;
+                    mistakesHTML += `<li>782 - 584 = ${document.getElementById('t3-a3')?.value || 'пусто'}, Проверка: ${document.getElementById('t3-c3-1')?.value || '_'} ${document.getElementById('t3-c3-2')?.value || '_'} = ${document.getElementById('t3-c3-3')?.value || '_'}</li></ul>`;
+                }
+                if (!firstAttemptCorrect[4]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Таблица умножения и деления». Задание 4</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Вычисли.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваши ответы:</p><ul style="font-size: 14px; column-count: 2;">`;
+                    const t4Questions = ["64:8", "4х7", "35:7", "6х7", "25:5", "2х7", "24:3", "4х8", "18:6", "7х7", "48:8", "7х8", "21:7", "6х10", "9х7", "24:8", "81:9", "70:10"];
+                    for(let i=1; i<=18; i++) {
+                        mistakesHTML += `<li>${t4Questions[i-1]} = ${document.getElementById(`t4-q${i}`)?.value || 'пусто'}</li>`;
+                    }
+                    mistakesHTML += `</ul>`;
+                }
+                
+                if (!firstAttemptCorrect[5]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Порядок действий в выражении». Задание 5</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Расставь порядок действий над выражениями и вычисли их значения.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваш порядок действий и ответы:</p>`;
+                    
+                    const o1_1 = document.getElementById('t5-o1-1')?.value || '_';
+                    const o1_2 = document.getElementById('t5-o1-2')?.value || '_';
+                    const o1_3 = document.getElementById('t5-o1-3')?.value || '_';
+                    const q1 = document.getElementById('t5-q1')?.value || 'пусто';
+                    mistakesHTML += `
+                        <div style="display: flex; align-items: flex-end; font-family: Arial, sans-serif; font-weight: bold; font-size: 18px; color: #3e2723; margin-bottom: 15px; flex-wrap: wrap;">
+                            <span>(6</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o1_1}</span>
+                                <span>х</span>
+                            </span>
+                            <span>6</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o1_2}</span>
+                                <span>+</span>
+                            </span>
+                            <span>45)</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o1_3}</span>
+                                <span>+</span>
+                            </span>
+                            <span>529 = <span style="border-bottom: 2px solid #3e2723; padding: 0 5px; color: #cc0000;">${q1}</span></span>
+                        </div>`;
+
+                    const o2_1 = document.getElementById('t5-o2-1')?.value || '_';
+                    const o2_2 = document.getElementById('t5-o2-2')?.value || '_';
+                    const o2_3 = document.getElementById('t5-o2-3')?.value || '_';
+                    const q2 = document.getElementById('t5-q2')?.value || 'пусто';
+                    mistakesHTML += `
+                        <div style="display: flex; align-items: flex-end; font-family: Arial, sans-serif; font-weight: bold; font-size: 18px; color: #3e2723; margin-bottom: 15px; flex-wrap: wrap;">
+                            <span>709</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o2_1}</span>
+                                <span>–</span>
+                            </span>
+                            <span>28</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o2_2}</span>
+                                <span>:</span>
+                            </span>
+                            <span>7</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o2_3}</span>
+                                <span>х</span>
+                            </span>
+                            <span>9 = <span style="border-bottom: 2px solid #3e2723; padding: 0 5px; color: #cc0000;">${q2}</span></span>
+                        </div>`;
+
+                    const o3_1 = document.getElementById('t5-o3-1')?.value || '_';
+                    const o3_2 = document.getElementById('t5-o3-2')?.value || '_';
+                    const o3_3 = document.getElementById('t5-o3-3')?.value || '_';
+                    const o3_4 = document.getElementById('t5-o3-4')?.value || '_';
+                    const o3_5 = document.getElementById('t5-o3-5')?.value || '_';
+                    const q3 = document.getElementById('t5-q3')?.value || 'пусто';
+                    mistakesHTML += `
+                        <div style="display: flex; align-items: flex-end; font-family: Arial, sans-serif; font-weight: bold; font-size: 18px; color: #3e2723; margin-bottom: 15px; flex-wrap: wrap;">
+                            <span>63</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o3_1}</span>
+                                <span>:</span>
+                            </span>
+                            <span>7</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o3_2}</span>
+                                <span>х</span>
+                            </span>
+                            <span>10</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o3_3}</span>
+                                <span>–</span>
+                            </span>
+                            <span>(6</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o3_4}</span>
+                                <span>х</span>
+                            </span>
+                            <span>6</span>
+                            <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 3px;">
+                                <span style="color: #cc0000; font-size: 14px; font-weight: bold;">${o3_5}</span>
+                                <span>+</span>
+                            </span>
+                            <span>39) = <span style="border-bottom: 2px solid #3e2723; padding: 0 5px; color: #cc0000;">${q3}</span></span>
+                        </div>`;
+                }
+
+                if (!firstAttemptCorrect[6]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Площадь прямоугольника». Задание 6</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Ширина стороны прямоугольника 4 см, а длина в 2 раза больше. Вычисли площадь прямоугольника. Запиши решение с пояснениями.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваше решение:</p><p style="font-size: 14px; background: #f9f9f9; padding: 5px;">${document.getElementById('t6-solution')?.value || 'пусто'}</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваш ответ:</p><p style="font-size: 14px;">${document.getElementById('t6-answer')?.value || 'пусто'}</p>`;
+                }
+                if (!firstAttemptCorrect[7]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Устные приёмы сложения и вычитания многозначных чисел». Задание 7</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">Найди закономерность и запиши следующие 3 числа.</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваши ответы:</p><ul style="font-size: 14px;">`;
+                    mistakesHTML += `<li>а) 806, 799, 792, ${document.getElementById('t7-q1a')?.value || '_'}, ${document.getElementById('t7-q1b')?.value || '_'}, ${document.getElementById('t7-q1c')?.value || '_'}</li>`;
+                    mistakesHTML += `<li>б) 882, 894, 906, ${document.getElementById('t7-q2a')?.value || '_'}, ${document.getElementById('t7-q2b')?.value || '_'}, ${document.getElementById('t7-q2c')?.value || '_'}</li></ul>`;
+                }
+                if (!firstAttemptCorrect[8]) {
+                    mistakesHTML += `<h3 style="color: #3e2723;">Тема: «Решение задач разного вида». Задание 8</h3>`;
+                    mistakesHTML += `<p style="font-size:14px; font-style:italic;">В библиотеке 3 зала. В каждом зале — 8 стеллажей. На каждом стеллаже стоит 5 коробок с книгами, а в каждой коробке лежит 2 книги. Сколько всего книг на этих стеллажах?</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваше решение:</p><p style="font-size: 14px; background: #f9f9f9; padding: 5px;">${document.getElementById('t8-solution')?.value || 'пусто'}</p>`;
+                    mistakesHTML += `<p style="font-weight: bold;">Ваш ответ:</p><p style="font-size: 14px;">${document.getElementById('t8-answer')?.value || 'пусто'}</p>`;
+                }
+            }
+
+            const pdfContent = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #3e2723; line-height: 1.5;">
+                    <h1 style="text-align: center; color: #3e2723; margin-bottom: 5px;">Контрольная работа</h1>
+                    <p style="text-align: center; font-size: 14px; color: #666; margin-top: 0;">Результаты проверки</p>
+                    <hr style="border: 1px solid #d9c8a9; margin: 15px 0;">
+                    <p><strong>Ученик:</strong> ${studentName}</p>
+                    <p><strong>Дата:</strong> ${dateStr}</p>
+                    <p><strong>Всего заданий:</strong> 8</p>
+                    <p><strong>Верно выполнено:</strong> <span style="color: #2e7d32; font-weight: bold;">${correct}</span></p>
+                    <p><strong>Допущено ошибок:</strong> <span style="color: #cc0000; font-weight: bold;">${errors}</span></p>
+                    <p><strong>Оценка:</strong> <span style="color: #800000; font-weight: bold; font-size: 18px;">${gradeText}</span></p>
+                    <hr style="border: 1px solid #d9c8a9; margin: 15px 0;">
+                    ${mistakesHTML}
+                    <hr style="border: 1px solid #d9c8a9; margin: 20px 0;">
+                    <p style="text-align: center; font-size: 12px; color: #888;">Документ сгенерирован автоматически. Правильные решения не отображаются в целях самостоятельной работы над ошибками.</p>
+                </div>
+            `;
+
+            const element = document.createElement('div');
+            element.innerHTML = pdfContent;
+            document.body.appendChild(element);
+
+            const opt = {
+                margin: 10,
+                filename: `Контрольная_работа_${studentName.replace(/[^а-яА-ЯёЁa-zA-Z0-9]/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(element);
+            }).catch(err => {
+                console.error("Ошибка генерации PDF:", err);
+                document.body.removeChild(element);
+                alert("Не удалось создать PDF. Попробуйте еще раз.");
+            });
+        }
+
+        function startContinuousConfetti() {
+            const container = document.getElementById('confetti-layer');
+            if (!container) return;
+            container.innerHTML = '';
+            if (confettiInterval) clearInterval(confettiInterval);
+            
+            const flowers = ['🌸', '🌺', '🌻', '🌼', '🌷', '💐', '🌹'];
+            
+            const addFlower = () => {
+                const el = document.createElement('div');
+                el.classList.add('flower-particle');
+                el.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                el.style.fontSize = (Math.random() * 15 + 20) + 'px';
+                container.appendChild(el);
+                
+                setTimeout(() => {
+                    if (el.parentNode === container) {
+                        container.removeChild(el);
+                    }
+                }, 5000);
+            };
+
+            for(let i = 0; i < 30; i++) {
+                setTimeout(addFlower, i * 50);
+            }
+
+            confettiInterval = setInterval(addFlower, 300);
+        }
+
+        function stopConfetti() {
+            if (confettiInterval) {
+                clearInterval(confettiInterval);
+                confettiInterval = null;
+            }
+            const container = document.getElementById('confetti-layer');
+            if (container) container.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
